@@ -97,8 +97,9 @@ export async function GET(request: NextRequest) {
 
       // Group by conversation
       const conversations = new Map();
+      const currentUserId = session.user!.id;
       messages.forEach((msg) => {
-        const otherUserId = msg.senderId === session.user.id ? msg.receiverId : msg.senderId;
+        const otherUserId = msg.senderId === currentUserId ? msg.receiverId : msg.senderId;
         if (!conversations.has(otherUserId)) {
           conversations.set(otherUserId, msg);
         }
