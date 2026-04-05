@@ -5,8 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Award, Zap, TrendingUp, BookOpen, Code2, Users, Edit2, Save, X, Github, Instagram, Twitter, Linkedin } from 'lucide-react';
-import Image from 'next/image';
+import { Award, Zap, TrendingUp, BookOpen, Code2, Users, Flame, Star } from 'lucide-react';
 import type { User } from '@/types';
 
 export default function Dashboard() {
@@ -15,17 +14,6 @@ export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [achievements, setAchievements] = useState<any[]>([]);
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [isSavingProfile, setIsSavingProfile] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    bio: '',
-    github: '',
-    instagram: '',
-    twitter: '',
-    linkedin: '',
-  });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -45,43 +33,10 @@ export default function Dashboard() {
       const data = await response.json();
       setUser(data);
       setAchievements(data.achievements || []);
-      setFormData({
-        name: data.name || '',
-        bio: data.bio || '',
-        github: data.github || '',
-        instagram: data.instagram || '',
-        twitter: data.twitter || '',
-        linkedin: data.linkedin || '',
-      });
     } catch (error) {
       console.error('Error fetching user:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSaveProfile = async () => {
-    setIsSavingProfile(true);
-    try {
-      const response = await fetch('/api/user/profile-update', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.data);
-        setIsEditingProfile(false);
-        // Success notification would go here
-      } else {
-        alert('Error al actualizar el perfil');
-      }
-    } catch (error) {
-      console.error('Error saving profile:', error);
-      alert('Error al guardar');
-    } finally {
-      setIsSavingProfile(false);
     }
   };
 
@@ -118,25 +73,91 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
-      {/* Header */}
+    <div className="min-h-screen pt-24 pb-12 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Welcome Header with Level & XP */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="container mx-auto px-4 mb-12 flex justify-between items-start"
+        transition={{ duration: 0.6 }}
+        className="container mx-auto px-4 mb-12"
       >
-        <div>
-          <h1 className="text-4xl font-bold mb-2">
-            ¡Bienvenido de vuelta, <span className="gradient-text">{user.name}</span>!
-          </h1>
-          <p className="text-gray-400">Sigue aprendiendo y creciendo con Kyrox</p>
+        <div className="card p-8 overflow-hidden relative">
+          {/* Background decoration */}
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-full blur-3xl -m-20" />
+          
+          <div className="relative grid md:grid-cols-3 gap-8 items-start">
+            {/* Welcome Section */}
+            <div className="md:col-span-2">
+              <p className="text-gray-400 text-sm mb-2">¡Bienvenido de vuelta!</p>
+              <h1 className="text-5xl md:text-6xl font-bold mb-4">
+                ¡Hola, <span className="gradient-text">{user?.name}</span>!
+              </h1>
+              <p className="text-gray-300 text-lg mb-6">
+                Continúa tu camino de aprendizaje con Kyrox
+              </p>
+              
+              {/* XP Progress Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-yellow-400" />
+                    <p className="text-gray-300">Experiencia</p>
+                  </div>
+                  <p className="font-bold text-white">
+                    {user?.xp || 0} / {user?.nextLevelXp || 100} XP
+                  </p>
+                </div>
+                <div className="w-full h-4 bg-slate-700 rounded-full overflow-hidden border border-purple-500/30">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${((user?.xp || 0) / (user?.nextLevelXp || 100)) * 100}%` }}
+                    transition={{ duration: 1.2, ease: 'easeOut' }}
+                    className="h-full bg-gradient-to-r from-yellow-400 via-purple-500 to-pink-500 shadow-lg shadow-purple-500/50"
+                  />
+                </div>
+                <p className="text-sm text-gray-400">
+                  {Math.round((((user?.xp || 0) / (user?.nextLevelXp || 100)) * 100))}% hasta el siguiente nivel
+                </p>
+              </div>
+            </div>
+
+            {/* Level Card */}
+            <div className="md:col-span-1 flex flex-col gap-4">
+              {/* Big Level Display */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.8, type: 'spring', stiffness: 100 }}
+                className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-8 text-center shadow-xl shadow-purple-500/50"
+              >
+                <p className="text-gray-200 text-sm mb-2 opacity-90">NIVEL ACTUAL</p>
+                <h2 className="text-7xl font-bold text-white mb-2">{user?.level || 1}</h2>
+                <div className="h-1 w-12 bg-white/30 rounded-full mx-auto" />
+              </motion.div>
+
+              {/* Quick Stats */}
+              <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+                <p className="text-gray-400 text-xs mb-3 font-semibold">PRÓXIMO NIVEL</p>
+                <p className="text-2xl font-bold text-purple-400">{(user?.level || 1) + 1}</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Falta {((user?.nextLevelXp || 100) - (user?.xp || 0))} XP
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Action Button */}
+          <div className="mt-8 pt-8 border-t border-slate-700 flex justify-end">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => signOut()}
+              className="px-6 py-2 bg-red-600/20 hover:bg-red-600/40 border border-red-500/50 hover:border-red-500 rounded-lg text-red-300 hover:text-red-200 transition-all font-semibold"
+            >
+              Cerrar Sesión
+            </motion.button>
+          </div>
         </div>
-        <button
-          onClick={() => signOut()}
-          className="px-4 py-2 bg-red-600/20 rounded-lg hover:bg-red-600/30 transition-colors"
-        >
-          Salir
-        </button>
       </motion.div>
 
       <motion.div
@@ -145,205 +166,6 @@ export default function Dashboard() {
         animate="visible"
         className="container mx-auto px-4 space-y-8"
       >
-        {/* Profile Section */}
-        <motion.div variants={itemVariants} className="card p-6">
-          <div className="flex items-start justify-between mb-6">
-            <h3 className="text-2xl font-bold flex items-center gap-2">
-              Mi Perfil
-            </h3>
-            {!isEditingProfile ? (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsEditingProfile(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white transition"
-              >
-                <Edit2 className="w-4 h-4" />
-                Editar
-              </motion.button>
-            ) : (
-              <div className="flex gap-2">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleSaveProfile}
-                  disabled={isSavingProfile}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white disabled:opacity-50"
-                >
-                  <Save className="w-4 h-4" />
-                  {isSavingProfile ? 'Guardando...' : 'Guardar'}
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setIsEditingProfile(false)}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white"
-                >
-                  <X className="w-4 h-4" />
-                  Cancelar
-                </motion.button>
-              </div>
-            )}
-          </div>
-
-          {isEditingProfile ? (
-            <div className="space-y-6">
-              {/* Name */}
-              <div>
-                <label className="text-gray-400 text-sm block mb-2">Nombre</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400"
-                  placeholder="Tu nombre"
-                />
-              </div>
-
-              {/* Bio */}
-              <div>
-                <label className="text-gray-400 text-sm block mb-2">Descripción Personal</label>
-                <textarea
-                  value={formData.bio}
-                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 h-24 resize-none"
-                  placeholder="Cuéntame sobre ti..."
-                />
-              </div>
-
-              {/* Social Links */}
-              <div>
-                <p className="text-gray-400 font-semibold mb-4">Redes Sociales</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-gray-400 text-sm flex items-center gap-2 mb-2">
-                      <Github className="w-4 h-4" /> GitHub
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.github || ''}
-                      onChange={(e) => setFormData({ ...formData, github: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
-                      placeholder="usuario"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-gray-400 text-sm flex items-center gap-2 mb-2">
-                      <Twitter className="w-4 h-4" /> Twitter
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.twitter || ''}
-                      onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
-                      placeholder="usuario"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-gray-400 text-sm flex items-center gap-2 mb-2">
-                      <Instagram className="w-4 h-4" /> Instagram
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.instagram || ''}
-                      onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
-                      placeholder="usuario"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-gray-400 text-sm flex items-center gap-2 mb-2">
-                      <Linkedin className="w-4 h-4" /> LinkedIn
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.linkedin || ''}
-                      onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
-                      placeholder="usuario"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div>
-                <p className="text-gray-400 text-sm mb-2">Nombre</p>
-                <p className="text-white font-semibold">{user?.name || '-'}</p>
-              </div>
-
-              <div>
-                <p className="text-gray-400 text-sm mb-2">Descripción</p>
-                <p className="text-white">{user?.bio || 'Sin descripción'}</p>
-              </div>
-
-              <div>
-                <p className="text-gray-400 font-semibold mb-3">Redes Sociales</p>
-                <div className="flex gap-3">
-                  {user?.github && (
-                    <a href={`https://github.com/${user.github}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition">
-                      <Github className="w-5 h-5" />
-                      <span className="text-sm">{user.github}</span>
-                    </a>
-                  )}
-                  {user?.twitter && (
-                    <a href={`https://twitter.com/${user.twitter}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-300 hover:text-blue-400 transition">
-                      <Twitter className="w-5 h-5" />
-                      <span className="text-sm">{user.twitter}</span>
-                    </a>
-                  )}
-                  {user?.instagram && (
-                    <a href={`https://instagram.com/${user.instagram}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-300 hover:text-pink-400 transition">
-                      <Instagram className="w-5 h-5" />
-                      <span className="text-sm">{user.instagram}</span>
-                    </a>
-                  )}
-                  {user?.linkedin && (
-                    <a href={`https://linkedin.com/in/${user.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-300 hover:text-blue-500 transition">
-                      <Linkedin className="w-5 h-5" />
-                      <span className="text-sm">{user.linkedin}</span>
-                    </a>
-                  )}
-                  {!user?.github && !user?.twitter && !user?.instagram && !user?.linkedin && (
-                    <p className="text-gray-500 text-sm">Agrega tus redes sociales</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </motion.div>
-        <motion.div variants={itemVariants} className="card">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <p className="text-gray-400 text-sm">Nivel Actual</p>
-              <h2 className="text-5xl font-bold gradient-text">{user.level}</h2>
-            </div>
-            <div className="w-24 h-24 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
-              <TrendingUp className="w-12 h-12" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <p className="text-gray-400">Experiencia</p>
-              <p className="font-medium">
-                {user.xp} / {user.nextLevelXp} XP
-              </p>
-            </div>
-            <div className="w-full h-3 bg-kyrox-darker rounded-full overflow-hidden border border-purple-500/20">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${xpProgress}%` }}
-                transition={{ duration: 1, ease: 'easeOut' }}
-                className="h-full bg-gradient-to-r from-purple-600 to-pink-600"
-              />
-            </div>
-          </div>
-        </motion.div>
 
         {/* Stats Grid */}
         <motion.div variants={itemVariants} className="grid md:grid-cols-3 gap-6">
