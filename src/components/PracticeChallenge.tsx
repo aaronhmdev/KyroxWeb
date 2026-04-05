@@ -75,8 +75,8 @@ export default function PracticeChallenge({ challenge, onComplete }: PracticeCha
       if (response.ok) {
         setResult(data);
 
-        // Si es exitoso y pasa el score mínimo, registrar progreso
-        if (data.status === 'success' && data.score >= 70) {
+        // Si no es error (success o info), registrar progreso con score >= 60
+        if (data.status !== 'error' && data.score >= 60) {
           try {
             // Registrar en BD
             const progressResponse = await fetch('/api/practice/progress', {

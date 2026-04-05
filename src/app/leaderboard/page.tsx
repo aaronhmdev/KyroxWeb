@@ -23,9 +23,17 @@ export default function LeaderboardPage() {
       try {
         const response = await fetch('/api/leaderboard');
         const data = await response.json();
-        setLeaderboard(data);
+        
+        // Validar que la respuesta es un array
+        if (Array.isArray(data)) {
+          setLeaderboard(data);
+        } else {
+          console.error('Invalid leaderboard data:', data);
+          setLeaderboard([]);
+        }
       } catch (error) {
         console.error('Error fetching leaderboard:', error);
+        setLeaderboard([]);
       } finally {
         setLoading(false);
       }

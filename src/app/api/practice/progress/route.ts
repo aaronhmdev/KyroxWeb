@@ -41,12 +41,32 @@ export async function POST(request: NextRequest) {
     const xpPerLevel = 500;
     const newLevel = Math.floor(newXP / xpPerLevel) + 1;
 
-    // Actualizar usuario
+    // Actualizar usuario y registrar challenge progress
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
         xp: newXP,
         level: newLevel,
+      },
+    });
+
+    // Registrar o actualizar ChallengeProgress
+    await prisma.challengeProgress.upsert({
+      where: {
+        userId_challengeId: {
+          userId: user.id,
+          challengeId,
+        },
+      },
+      update: {
+        score,
+        completed: status === 'completed',
+      },
+      create: {
+        userId: user.id,
+        challengeId,
+        score,
+        completed: status === 'completed',
       },
     });
 

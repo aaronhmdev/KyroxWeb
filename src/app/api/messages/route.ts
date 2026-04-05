@@ -100,8 +100,16 @@ export async function GET(request: NextRequest) {
       const currentUserId = session.user!.id;
       messages.forEach((msg) => {
         const otherUserId = msg.senderId === currentUserId ? msg.receiverId : msg.senderId;
+        const otherUser = msg.senderId === currentUserId ? msg.receiver : msg.sender;
+        
         if (!conversations.has(otherUserId)) {
-          conversations.set(otherUserId, msg);
+          conversations.set(otherUserId, {
+            userId: otherUserId,
+            userName: otherUser.name,
+            userImage: otherUser.image,
+            lastMessage: msg.content,
+            lastMessageTime: msg.createdAt,
+          });
         }
       });
 

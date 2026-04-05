@@ -240,6 +240,7 @@ model ChallengeProgress {
   userId       String
   challengeId  String
   progress     Int      @default(0)
+  score        Int      @default(0)
   completed    Boolean  @default(false)
   completedAt  DateTime?
   createdAt    DateTime @default(now())

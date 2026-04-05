@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import { motion } from 'framer-motion';
-import { Menu, X, BookOpen, Code2, Trophy, Users, Music, Mail, Zap, Home, LogOut } from 'lucide-react';
+import { Menu, X, BookOpen, Code2, Trophy, Users, Music, Mail, Zap, Home, LogOut, User, MessageCircle } from 'lucide-react';
 
 interface NavbarProps {
   session: Session | null;
@@ -69,6 +69,20 @@ export default function Navbar({ session: initialSession }: NavbarProps) {
             <div className="hidden md:flex gap-2">
               {session && session.user ? (
                 <>
+                  <Link
+                    href="/profile"
+                    className="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-purple-600/30 to-pink-600/30 hover:from-purple-600/50 hover:to-pink-600/50 transition-all border border-purple-500/30 hover:border-purple-500/60 flex items-center gap-2"
+                  >
+                    <User className="w-4 h-4" />
+                    Perfil
+                  </Link>
+                  <Link
+                    href="/messages"
+                    className="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-purple-600/30 to-pink-600/30 hover:from-purple-600/50 hover:to-pink-600/50 transition-all border border-purple-500/30 hover:border-purple-500/60 flex items-center gap-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Mensajes
+                  </Link>
                   <Link
                     href="/dashboard"
                     className="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-purple-600/30 to-pink-600/30 hover:from-purple-600/50 hover:to-pink-600/50 transition-all border border-purple-500/30 hover:border-purple-500/60 flex items-center gap-2"
@@ -143,8 +157,25 @@ export default function Navbar({ session: initialSession }: NavbarProps) {
               {session && session.user ? (
                 <>
                   <Link
+                    href="/profile"
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-center justify-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <User className="w-4 h-4" />
+                    Mi Perfil
+                  </Link>
+                  <Link
+                    href="/messages"
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-center justify-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Mensajes
+                  </Link>
+                  <Link
                     href="/dashboard"
                     className="flex items-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-center justify-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+                    onClick={() => setIsOpen(false)}
                   >
                     <Trophy className="w-4 h-4" />
                     Dashboard
