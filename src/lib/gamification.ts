@@ -7,6 +7,8 @@ export const XP_REWARDS_CONST = {
 };
 
 const XP_PER_LEVEL = 500;
+const BASE_XP_FOR_LEVEL = 100;
+const LEVEL_XP_MULTIPLIER = 1.1;
 
 export async function addXP(userId: string, amount: number) {
   const user = await prisma.user.findUnique({
@@ -75,5 +77,3 @@ export async function unlockAchievement(userId: string, achievementId: string) {
 export function calculateNextLevelXp(level: number): number {
   return Math.floor(BASE_XP_FOR_LEVEL * Math.pow(LEVEL_XP_MULTIPLIER, level - 1));
 }
-
-export const XP_REWARDS_CONST = XP_REWARDS;
