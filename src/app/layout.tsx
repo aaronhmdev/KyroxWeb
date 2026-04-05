@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Navbar from '@/components/navbar/Navbar';
 import Providers from '@/components/providers';
+import { HydrationErrorHandler } from '@/components/HydrationErrorHandler';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
+          <HydrationErrorHandler />
           <Navbar />
           <main className="relative z-10">{children}</main>
         </Providers>

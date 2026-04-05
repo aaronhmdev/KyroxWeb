@@ -1,12 +1,12 @@
 'use client';
 
-import { SessionProvider } from 'next-auth/react';
+import { ClientSession } from './ClientSession';
 import type { PropsWithChildren } from 'react';
 
 export default function Providers({ children }: PropsWithChildren) {
   return (
-    <SessionProvider refetchInterval={0}>
+    <ClientSession>
       {children}
-    </SessionProvider>
+    </ClientSession>
   );
 }
