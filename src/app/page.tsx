@@ -202,7 +202,7 @@ export default function Home() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid md:grid-cols-2 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {features.map((feature, index) => {
               const Icon = feature.icon;
@@ -210,7 +210,7 @@ export default function Home() {
                 <motion.div
                   key={index}
                   variants={featureVariants}
-                  className="feature-card group"
+                  className="feature-card group h-full"
                 >
                   <div className="flex items-start gap-4">
                     <div className={`bg-gradient-to-r ${feature.gradient} p-3 rounded-lg`}>
