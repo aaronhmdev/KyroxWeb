@@ -13,6 +13,12 @@ import {
   Star,
   ArrowRight,
   LogIn,
+  Code,
+  Database,
+  Zap,
+  GitBranch,
+  Palette,
+  Cpu,
 } from 'lucide-react';
 import Link from 'next/link';
 import CourseSlideshow from '@/components/CourseSlideshow';
@@ -500,7 +506,10 @@ export default function CoursesPage() {
   const loadProgress = async () => {
     try {
       const response = await fetch('/api/courses/progress');
-      const progress = await response.json();
+      const data = await response.json();
+      
+      // Validar que data es un array
+      const progress = Array.isArray(data) ? data : [];
       
       setCourses(prev =>
         prev.map(course => ({
@@ -513,6 +522,14 @@ export default function CoursesPage() {
       );
     } catch (error) {
       console.error('Error loading progress:', error);
+      // En caso de error, resetear a valores por defecto
+      setCourses(prev =>
+        prev.map(course => ({
+          ...course,
+          completed: false,
+          progress: 0,
+        }))
+      );
     }
   };
 
@@ -551,38 +568,156 @@ export default function CoursesPage() {
     filter === 'all' ? courses : courses.filter(c => c.level === filter);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-20">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-20 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Rotating Stars */}
+        <motion.div
+          className="absolute top-20 right-20 text-purple-500/20"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+        >
+          <Star size={80} />
+        </motion.div>
+
+        <motion.div
+          className="absolute bottom-40 left-10 text-pink-500/10"
+          animate={{ rotate: -360 }}
+          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+        >
+          <Code size={100} />
+        </motion.div>
+
+        <motion.div
+          className="absolute top-1/2 left-1/4 text-blue-500/5"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+        >
+          <Database size={120} />
+        </motion.div>
+
+        {/* Floating Symbols */}
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute text-purple-400/10"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              x: [0, Math.random() * 20 - 10, 0],
+            }}
+            transition={{
+              duration: 4 + Math.random() * 2,
+              repeat: Infinity,
+              delay: i * 0.5,
+            }}
+          >
+            {[<Zap key={0} />, <GitBranch key={1} />, <Palette key={2} />, <Cpu key={3} />, <Code key={4} />][i]}
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl font-bold text-white mb-4">
-            Cursos de Desarrollo
-          </h1>
-          <p className="text-xl text-gray-400">
-            Aprende a construir aplicaciones web modernas
-          </p>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+            >
+              <Star className="w-8 h-8 text-purple-400" />
+            </motion.div>
+            <h1 className="text-5xl font-bold text-white">
+              Cursos de <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Desarrollo</span>
+            </h1>
+            <motion.div
+              animate={{ rotate: -360 }}
+              transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+            >
+              <Code className="w-8 h-8 text-pink-400" />
+            </motion.div>
+          </div>
+          <motion.p 
+            className="text-xl text-gray-400"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            Aprende a construir aplicaciones web modernas con proyectos en tiempo real
+          </motion.p>
         </motion.div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-3 justify-center mb-12">
-          {(['all', 'BASICO', 'INTERMEDIO', 'AVANZADO'] as const).map(level => (
-            <button
+        <motion.div 
+          className="flex flex-wrap gap-3 justify-center mb-12"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          {(['all', 'BASICO', 'INTERMEDIO', 'AVANZADO'] as const).map((level, idx) => (
+            <motion.button
               key={level}
               onClick={() => setFilter(level)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className={`px-6 py-2 rounded-lg font-semibold transition-all ${
                 filter === level
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
                   : 'bg-white/10 text-gray-300 hover:bg-white/20'
               }`}
             >
               {level === 'all' ? 'Todos' : level}
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
+
+        {/* Statistics Section */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          {[
+            { label: 'Cursos', value: courses.length, icon: <BookOpen className="w-6 h-6" /> },
+            { label: 'Completados', value: courses.filter(c => c.completed).length, icon: <CheckCircle className="w-6 h-6" /> },
+            { label: 'En Progreso', value: courses.filter(c => !c.completed && (c.progress ?? 0) > 0).length, icon: <Zap className="w-6 h-6" /> },
+          ].map((stat, idx) => (
+            <motion.div
+              key={idx}
+              className="card bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20"
+              whileHover={{ scale: 1.05, borderColor: 'rgba(196, 132, 252, 0.6)' }}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">{stat.label}</p>
+                  <motion.p 
+                    className="text-3xl font-bold text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 100 }}
+                  >
+                    {stat.value}
+                  </motion.p>
+                </div>
+                <motion.div
+                  className="text-purple-400 opacity-20 group-hover:opacity-40"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10, repeat: Infinity }}
+                >
+                  {stat.icon}
+                </motion.div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
 
         {/* Courses Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -594,12 +729,15 @@ export default function CoursesPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ delay: index * 0.05 }}
-                className="card group cursor-pointer hover:shadow-xl transition-all"
+                className="card group cursor-pointer hover:shadow-xl transition-all hover:scale-105 relative overflow-hidden"
                 onClick={() => setSelectedCourse(course)}
               >
-                {/* Course Image */}
+                {/* Animated Gradient Overlay */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-gradient-to-br from-purple-400 to-pink-400" />
+
+                {/* Course Image with Animation */}
                 <div
-                  className={`h-40 rounded-lg mb-4 bg-gradient-to-br flex items-center justify-center ${
+                  className={`h-40 rounded-lg mb-4 bg-gradient-to-br flex items-center justify-center relative overflow-hidden group-hover:scale-110 transition-transform duration-300 ${
                     course.level === 'BASICO'
                       ? 'from-blue-600 to-blue-400'
                       : course.level === 'INTERMEDIO'
@@ -607,12 +745,46 @@ export default function CoursesPage() {
                       : 'from-red-600 to-red-400'
                   }`}
                 >
-                  <BookOpen className="w-12 h-12 text-white/50" />
+                  {/* Animated Icon */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity }}
+                    className="absolute"
+                  >
+                    <BookOpen className="w-12 h-12 text-white/50" />
+                  </motion.div>
+
+                  {/* Additional Icons */}
+                  <motion.div
+                    className="absolute top-4 right-4 text-white/30"
+                    animate={{ y: [0, -5, 0] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    {course.level === 'BASICO' ? (
+                      <Code size={20} />
+                    ) : course.level === 'INTERMEDIO' ? (
+                      <GitBranch size={20} />
+                    ) : (
+                      <Cpu size={20} />
+                    )}
+                  </motion.div>
                 </div>
 
                 {/* Course Info */}
-                <h3 className="text-lg font-bold mb-2">{course.title}</h3>
+                <h3 className="text-lg font-bold mb-2 group-hover:text-purple-300 transition-colors">{course.title}</h3>
                 <p className="text-gray-400 text-sm mb-4">{course.description}</p>
+
+                {/* Progress Bar if in progress */}
+                {(course.progress ?? 0) > 0 && !course.completed && (
+                  <div className="mb-4 bg-white/10 rounded-full h-2 overflow-hidden">
+                    <motion.div
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 h-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${course.progress ?? 0}%` }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </div>
+                )}
 
                 {/* Meta Info */}
                 <div className="space-y-2 mb-4 text-sm text-gray-400">
@@ -625,7 +797,10 @@ export default function CoursesPage() {
                     {course.students} estudiantes
                   </div>
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4" />4.8 (342 reseñas)
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 5, repeat: Infinity }}>
+                      <Star className="w-4 h-4" />
+                    </motion.div>
+                    4.8 (342 reseñas)
                   </div>
                 </div>
 
@@ -643,20 +818,27 @@ export default function CoursesPage() {
                     {course.level}
                   </span>
                   {course.completed ? (
-                    <div className="flex items-center gap-1 text-green-400">
+                    <motion.div
+                      className="flex items-center gap-1 text-green-400"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring' }}
+                    >
                       <CheckCircle className="w-4 h-4" />
                       <span className="text-xs font-semibold">Completado</span>
-                    </div>
+                    </motion.div>
                   ) : (
-                    <button
+                    <motion.button
                       onClick={e => {
                         e.stopPropagation();
                         setSelectedCourse(course);
                       }}
                       className="text-purple-400 hover:text-purple-300 transition-colors"
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <ArrowRight className="w-5 h-5" />
-                    </button>
+                    </motion.button>
                   )}
                 </div>
               </motion.div>
@@ -673,70 +855,136 @@ export default function CoursesPage() {
             onClick={() => setSelectedCourse(null)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
               onClick={e => e.stopPropagation()}
-              className="card max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+              className="card max-w-2xl w-full max-h-[80vh] overflow-y-auto relative"
             >
+              {/* Animated Background */}
+              <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl" />
+
               <button
                 onClick={() => setSelectedCourse(null)}
-                className="float-right text-2xl text-gray-400 hover:text-white mb-4"
+                className="float-right text-2xl text-gray-400 hover:text-white mb-4 relative z-10"
               >
                 ✕
               </button>
 
-              <h2 className="text-3xl font-bold mb-4">{selectedCourse.title}</h2>
-              <p className="text-gray-400 mb-6">{selectedCourse.description}</p>
-
-              {/* Metadata */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <p className="text-xs text-gray-400">Duración</p>
-                  <p className="text-lg font-bold text-white">
-                    {Math.floor(selectedCourse.duration / 60)} min
-                  </p>
-                </div>
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <p className="text-xs text-gray-400">Nivel</p>
-                  <p className="text-lg font-bold text-white">{selectedCourse.level}</p>
-                </div>
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <p className="text-xs text-gray-400">Recompensa XP</p>
-                  <p className="text-lg font-bold text-purple-400">+100 XP</p>
+              {/* Header with Icon */}
+              <div className="flex items-start gap-4 mb-6 relative z-10">
+                <motion.div
+                  animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+                  transition={{ duration: 20, repeat: Infinity }}
+                  className={`flex-shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br flex items-center justify-center ${
+                    selectedCourse.level === 'BASICO'
+                      ? 'from-blue-600 to-blue-400'
+                      : selectedCourse.level === 'INTERMEDIO'
+                      ? 'from-yellow-600 to-yellow-400'
+                      : 'from-red-600 to-red-400'
+                  }`}
+                >
+                  <BookOpen className="w-8 h-8 text-white" />
+                </motion.div>
+                <div className="flex-1">
+                  <h2 className="text-3xl font-bold mb-2">{selectedCourse.title}</h2>
+                  <p className="text-gray-400">{selectedCourse.description}</p>
                 </div>
               </div>
 
-              {/* Content */}
-              <div className="prose prose-invert max-w-none mb-6">
+              {/* Metadata Grid */}
+              <div className="grid grid-cols-3 gap-4 mb-6 relative z-10">
+                {[
+                  { label: 'Duración', value: `${Math.floor(selectedCourse.duration / 60)} min`, icon: <Clock className="w-4 h-4" /> },
+                  { label: 'Nivel', value: selectedCourse.level, icon: <Star className="w-4 h-4" /> },
+                  { label: 'Recompensa', value: '+100 XP', icon: <Zap className="w-4 h-4" /> },
+                ].map((item, idx) => (
+                  <motion.div
+                    key={idx}
+                    className="p-3 bg-white/5 rounded-lg border border-purple-500/20 hover:border-purple-500/50 transition-colors"
+                    whileHover={{ y: -4 }}
+                  >
+                    <div className="flex items-center gap-2 mb-1 text-purple-400">
+                      {item.icon}
+                      <p className="text-xs text-gray-400">{item.label}</p>
+                    </div>
+                    <p className="text-lg font-bold text-white">{item.value}</p>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Progress Bar if in progress */}
+              {(selectedCourse.progress ?? 0) > 0 && !selectedCourse.completed && (
+                <motion.div className="mb-6 relative z-10">
+                  <div className="flex justify-between mb-2">
+                    <p className="text-sm text-gray-400">Progreso del curso</p>
+                    <p className="text-sm font-bold text-purple-400">{Math.round(selectedCourse.progress ?? 0)}%</p>
+                  </div>
+                  <div className="bg-white/10 rounded-full h-3 overflow-hidden border border-purple-500/20">
+                    <motion.div
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 h-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${selectedCourse.progress ?? 0}%` }}
+                      transition={{ duration: 0.8 }}
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Content Section */}
+              <div className="prose prose-invert max-w-none mb-6 relative z-10">
                 <div className="max-h-64 overflow-y-auto pr-4">
                   {selectedCourse.content.split('\n').map((line, i) => {
                     if (line.startsWith('# ')) {
                       return (
-                        <h3 key={i} className="text-xl font-bold text-white mt-4 mb-2">
+                        <motion.h3 
+                          key={i} 
+                          className="text-xl font-bold text-white mt-4 mb-2"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.02 }}
+                        >
                           {line.replace('# ', '')}
-                        </h3>
+                        </motion.h3>
                       );
                     }
                     if (line.startsWith('## ')) {
                       return (
-                        <h4 key={i} className="text-lg font-semibold text-purple-300 mt-3 mb-1">
+                        <motion.h4 
+                          key={i} 
+                          className="text-lg font-semibold text-purple-300 mt-3 mb-1"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.02 }}
+                        >
                           {line.replace('## ', '')}
-                        </h4>
+                        </motion.h4>
                       );
                     }
                     if (line.startsWith('- ')) {
                       return (
-                        <li key={i} className="text-gray-300 ml-4">
+                        <motion.li 
+                          key={i} 
+                          className="text-gray-300 ml-4"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.02 }}
+                        >
                           {line.replace('- ', '')}
-                        </li>
+                        </motion.li>
                       );
                     }
                     if (line.trim() !== '') {
                       return (
-                        <p key={i} className="text-gray-300 mb-2">
+                        <motion.p 
+                          key={i} 
+                          className="text-gray-300 mb-2"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: i * 0.02 }}
+                        >
                           {line}
-                        </p>
+                        </motion.p>
                       );
                     }
                     return null;
@@ -744,15 +992,17 @@ export default function CoursesPage() {
                 </div>
               </div>
 
-              {/* Action Button */}
-              <div className="flex gap-3">
-                <button
+              {/* Action Buttons */}
+              <div className="flex gap-3 relative z-10">
+                <motion.button
                   onClick={() => setSelectedCourse(null)}
                   className="flex-1 px-6 py-3 rounded-lg border border-gray-600 text-gray-300 hover:text-white transition-colors font-semibold"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Cerrar
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={() => setViewingSlideshow(true)}
                   disabled={selectedCourse.completed || completingCourse}
                   className={`flex-1 px-6 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all ${
@@ -760,6 +1010,8 @@ export default function CoursesPage() {
                       ? 'bg-green-500/20 text-green-300 cursor-default'
                       : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg'
                   }`}
+                  whileHover={!selectedCourse.completed ? { scale: 1.02 } : {}}
+                  whileTap={!selectedCourse.completed ? { scale: 0.98 } : {}}
                 >
                   {selectedCourse.completed ? (
                     <>
@@ -767,14 +1019,19 @@ export default function CoursesPage() {
                       Completado
                     </>
                   ) : completingCourse ? (
-                    'Guardando...'
+                    <>
+                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }}>
+                        <Zap className="w-5 h-5" />
+                      </motion.div>
+                      Completando...
+                    </>
                   ) : (
                     <>
                       <Play className="w-5 h-5" />
-                      Completar Curso
+                      Comenzar Curso
                     </>
                   )}
-                </button>
+                </motion.button>
               </div>
             </motion.div>
           </div>
@@ -789,30 +1046,49 @@ export default function CoursesPage() {
             onClick={() => setShowLoginModal(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
               onClick={e => e.stopPropagation()}
-              className="card text-center max-w-md"
+              className="card text-center max-w-md relative"
             >
-              <LogIn className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-2">Acceso Requerido</h2>
-              <p className="text-gray-400 mb-6">
-                Necesitas iniciar sesión para completar cursos
+              <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl" />
+              
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 10, repeat: Infinity }}
+                className="relative z-10"
+              >
+                <LogIn className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+              </motion.div>
+              
+              <h2 className="text-2xl font-bold text-white mb-2 relative z-10">Acceso Requerido</h2>
+              <p className="text-gray-400 mb-6 relative z-10">
+                Necesitas iniciar sesión para completar cursos y ganar experiencia
               </p>
-              <div className="flex gap-3">
-                <button
+              
+              <div className="flex gap-3 relative z-10">
+                <motion.button
                   onClick={() => setShowLoginModal(false)}
                   className="flex-1 px-6 py-2 rounded-lg border border-gray-600 text-gray-300 hover:text-white transition-colors"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Cancelar
-                </button>
-                <Link
-                  href="/auth/login"
-                  className="flex-1 px-6 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold hover:shadow-lg transition-all"
+                </motion.button>
+                <motion.div
+                  className="flex-1"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  Iniciar Sesión
-                </Link>
+                  <Link
+                    href="/auth/login"
+                    className="flex items-center justify-center gap-2 px-6 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold hover:shadow-lg transition-all h-full"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Iniciar Sesión
+                  </Link>
+                </motion.div>
               </div>
             </motion.div>
           </div>
