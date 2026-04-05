@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import Navbar from '@/components/navbar/Navbar';
 import Providers from '@/components/providers';
 import './globals.css';
@@ -11,13 +9,11 @@ export const metadata: Metadata = {
   keywords: 'education, web development, courses, learning',
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-
   return (
     <html lang="es" className="scroll-smooth">
       <head>
@@ -26,7 +22,7 @@ export default async function RootLayout({
       </head>
       <body className="bg-gradient-to-br from-[#0f0f1e] via-[#1a1a2e] to-[#16213e] text-white min-h-screen">
         <Providers>
-          <Navbar session={session} />
+          <Navbar />
           <main className="relative z-10">{children}</main>
         </Providers>
       </body>

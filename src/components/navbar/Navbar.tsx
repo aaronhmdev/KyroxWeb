@@ -3,15 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import type { Session } from 'next-auth';
 import { motion } from 'framer-motion';
-import { Menu, X, BookOpen, Code2, Trophy, Users, Music, Mail, Zap, Home, LogOut, User, MessageCircle } from 'lucide-react';
+import { Menu, X, BookOpen, Code2, Trophy, Users, Music, Mail, Zap, Home, LogOut, MessageCircle } from 'lucide-react';
 
-interface NavbarProps {
-  session: Session | null;
-}
-
-export default function Navbar({ session: initialSession }: NavbarProps) {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
 
