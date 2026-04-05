@@ -70,11 +70,11 @@ export default function Navbar({ session: initialSession }: NavbarProps) {
               {session && session.user ? (
                 <>
                   <Link
-                    href="/profile"
+                    href="/dashboard"
                     className="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-purple-600/30 to-pink-600/30 hover:from-purple-600/50 hover:to-pink-600/50 transition-all border border-purple-500/30 hover:border-purple-500/60 flex items-center gap-2"
                   >
                     <User className="w-4 h-4" />
-                    Perfil
+                    Mi Perfil
                   </Link>
                   <Link
                     href="/messages"
@@ -157,7 +157,7 @@ export default function Navbar({ session: initialSession }: NavbarProps) {
               {session && session.user ? (
                 <>
                   <Link
-                    href="/profile"
+                    href="/dashboard"
                     className="flex items-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-center justify-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
                     onClick={() => setIsOpen(false)}
                   >
