@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+*.config.js
+.env
+.env.local
+.env.*.local
+.vercel/
+.turbo/
+.DS_Store
+*.pem
