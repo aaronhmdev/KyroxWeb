@@ -17,19 +17,35 @@ export async function POST(request: Request) {
 
     if (password !== confirmPassword) {
       return NextResponse.json(
-        { error: 'Passwords do not match' },
+        { error: 'Las contraseñas no coinciden' },
         { status: 400 }
       );
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
+    // Check if email already exists
+    const existingEmail = await prisma.user.findUnique({
       where: { email },
     });
 
-    if (existingUser) {
+    if (existingEmail) {
       return NextResponse.json(
-        { error: 'Email already registered' },
+        { error: 'El email ya está registrado' },
+        { status: 400 }
+      );
+    }
+
+    // Check if username already exists
+    const existingUsername = await prisma.user.findFirst({
+      where: {
+        name: {
+          equals: name,
+        },
+      },
+    });
+
+    if (existingUsername) {
+      return NextResponse.json(
+        { error: 'El nombre de usuario ya está en uso' },
         { status: 400 }
       );
     }
@@ -51,7 +67,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        message: 'User registered successfully',
+        message: 'Usuario registrado exitosamente',
         user: {
           id: user.id,
           name: user.name,
@@ -63,7 +79,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(
-      { error: 'An error occurred during registration' },
+      { error: 'Ocurrió un error durante el registro' },
       { status: 500 }
     );
   }

@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -23,8 +23,25 @@ export async function POST(request: NextRequest) {
 
     if (receiverId === session.user.id) {
       return NextResponse.json(
-        { error: "Can't send messages to yourself" },
+        { error: 'No puedes enviarte mensajes a ti mismo' },
         { status: 400 }
+      );
+    }
+
+    // Check if users are friends
+    const friendship = await prisma.follow.findFirst({
+      where: {
+        AND: [
+          { followerId: session.user.id },
+          { followingId: receiverId },
+        ],
+      },
+    });
+
+    if (!friendship) {
+      return NextResponse.json(
+        { error: 'Debes ser amigo de este usuario para enviar mensajes' },
+        { status: 403 }
       );
     }
 
